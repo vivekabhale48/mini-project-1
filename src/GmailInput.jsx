@@ -5,43 +5,31 @@ import GmailItemList from "./GmailItemList";
 const GmailInput = () => {
   const [gmailInput, setgmail] = useState("");
   const [filterData, setFilterData] = useState(null);
-  const [allSelectedDatas, setSelectedDatas] = useState([]);
+  const [selectEmail, setSelectEmail] = useState([]);
 
   useEffect(() => {
     const filteredData = datas.filter((filterData) => {
       return gmailInput.toLowerCase() === ""
-        ? filterData
+        ? null
         : filterData.email.toLowerCase().includes(gmailInput);
     });
     setFilterData(filteredData);
-    console.log(allSelectedDatas);
-  }, [gmailInput, allSelectedDatas]);
+  }, [gmailInput]);
 
   function handleOnChange(e) {
     setgmail(e.target.value);
   }
 
   function onClick(gmailId) {
-    console.log("selected Id is :" + gmailId);
-
-    const mappedData = filterData.map((gdata)=> gmailId === gdata.id ? {...gdata, valueSelected: true}: gdata)
-    setFilterData(mappedData);
-
-    const selectedData = filterData.filter((selectData) => {
-      return gmailId === selectData.id
+    setSelectEmail((previousEmails) => {
+      if (previousEmails.includes(gmailId)) {
+        return previousEmails.filter((id) => id !== gmailId);
+      } else return [...previousEmails, gmailId];
     });
-    //Type of the selected data is an array and it has the selected object inside that array. It changes every time we click diff user. It doesnot keeps the previous selected object. Hence to keep the previous one too we added below code.
-    selectedData.map((mydata) => {
-      return setSelectedDatas((previousValue) => [...previousValue, mydata])
-    });
-    
-
-    console.log(mappedData)
-    console.log(filterData)
   }
 
   return (
-    <section className="w-full">
+    <section className="w-full relative">
       <div className="p-5 flex flex-col justify-center items-center">
         <input
           onChange={handleOnChange}
@@ -55,19 +43,37 @@ const GmailInput = () => {
         />
 
         {filterData && filterData.length > 0 ? (
-          <div className="bg-[#B9C6AE] w-[50%] p-2 shadow-xl z-50">
+          <div className="bg-[#B9C6AE] w-[50%] p-2 shadow-xl z-50 cursor-pointer">
             {filterData &&
               filterData.map((gmailData) => (
                 <GmailItemList
                   key={gmailData.id}
+                  selected={selectEmail.includes(gmailData.id)}
                   setGmailData={gmailData}
-                  id={gmailData.id}
                   onSelected={() => onClick(gmailData.id)}
                 />
               ))}
           </div>
         ) : null}
       </div>
+
+      {selectEmail.length > 0 && (
+        <div className="mt-3 absolute top-0 flex flex-col">
+          {selectEmail.map((selectedEmailId) => {
+            const selectedEmailData = datas.find(
+              (data) => data.id === selectedEmailId
+            );
+            return (
+              <span
+                key={selectedEmailId}
+                className="inline-block bg-blue-500 text-white p-2 m-1 rounded"
+              >
+                {selectedEmailData.email}
+              </span>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };
