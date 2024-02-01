@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import datas from "./DataGmail";
 import GmailItemList from "./GmailItemList";
+import { MdDelete } from "react-icons/md";
 
 const GmailInput = () => {
   const [gmailInput, setgmail] = useState("");
@@ -66,9 +67,10 @@ const GmailInput = () => {
             return (
               <span
                 key={selectedEmailId}
-                className="inline-block bg-blue-500 text-white p-2 m-1 rounded"
+                className="inline-block bg-blue-500 text-white p-2 m-1 rounded flex justify-between items-center gap-x-3"
               >
                 {selectedEmailData.email}
+                <span><MdDelete className="cursor-pointer" onClick={()=> onClick(selectedEmailId)}/></span>
               </span>
             );
           })}
